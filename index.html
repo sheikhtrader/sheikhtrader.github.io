@@ -52,6 +52,15 @@
     color:#f6e7bf;border:1px solid var(--gold);border-radius:8px;padding:13px;font-weight:700;margin-top:12px;font-size:16px;cursor:pointer;font-family:inherit}
   .done button.sec{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:600}
   .risk{font-size:12px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.8}
+  .chart{position:relative;margin:16px 0 0;background:#2b1d14;border:1px solid var(--gold);border-radius:8px;overflow:hidden;
+    box-shadow:0 6px 18px rgba(80,50,20,.25)}
+  .chart canvas{display:block;width:100%;height:190px}
+  .chart .price{position:absolute;top:8px;left:10px;direction:ltr;font-family:Consolas,monospace;font-size:13px;color:#f6e7bf}
+  .chart .price b{font-size:16px}
+  .chart .tag{position:absolute;bottom:6px;right:10px;font-size:11px;color:#bfa77a;direction:rtl}
+  .chart .live{position:absolute;top:8px;right:10px;font-size:11px;color:#f6e7bf;display:flex;align-items:center;gap:5px}
+  .chart .live i{width:7px;height:7px;border-radius:50%;background:#d9534f;animation:blink 1.2s infinite}
+  @keyframes blink{50%{opacity:.25}}
 </style>
 </head>
 <body>
@@ -62,6 +71,12 @@
     <div class="crown">♛</div>
     <h1 id="title">سجّل بدورة <span>التداول</span></h1>
     <p id="sub"></p>
+    <div class="chart">
+      <canvas id="cv"></canvas>
+      <div class="live"><i></i>محاكاة</div>
+      <div class="price" id="px"></div>
+      <div class="tag">رسم توضيحي متحرك للتعليم، ليس صفقات حقيقية</div>
+    </div>
     <ul class="points" id="points"></ul>
   </header>
 
@@ -169,6 +184,59 @@ $("copyBtn").addEventListener("click", async () => {
 });
 
 function fail(t){ $("err").textContent = t; }
+
+/* ===== شارت متحرك (محاكاة عشوائية للتوضيح فقط) ===== */
+(function(){
+  const cv = $("cv"), ctx = cv.getContext("2d"), px = $("px");
+  const MAX = 34, still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let W=0,H=0, dpr=1, candles=[], price=100;
+  const rnd = (a,b)=>a+Math.random()*(b-a);
+
+  function newCandle(){ return {o:price,h:price,l:price,c:price}; }
+  function tick(c){
+    price = Math.max(20, price + rnd(-0.55,0.6) + (Math.random()<0.08 ? rnd(-1.5,1.5):0));
+    c.c = price; c.h = Math.max(c.h,price); c.l = Math.min(c.l,price);
+  }
+  for(let i=0;i<MAX-1;i++){ const c=newCandle(); for(let k=0;k<8;k++) tick(c); candles.push(c); }
+  candles.push(newCandle());
+
+  function resize(){
+    dpr = window.devicePixelRatio||1;
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W*dpr; cv.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    let lo=Infinity, hi=-Infinity;
+    candles.forEach(c=>{lo=Math.min(lo,c.l);hi=Math.max(hi,c.h)});
+    const pad=(hi-lo)*0.15||1; lo-=pad; hi+=pad;
+    const y = v => H-22 - (v-lo)/(hi-lo)*(H-50);
+    ctx.strokeStyle="rgba(184,137,58,.15)"; ctx.lineWidth=1;
+    for(let i=1;i<5;i++){ const gy=i*H/5; ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+    const cw = W/MAX;
+    candles.forEach((c,i)=>{
+      const x = i*cw + cw/2, up = c.c>=c.o;
+      ctx.strokeStyle = ctx.fillStyle = up ? "#d9b45a" : "#b4283c";
+      ctx.beginPath(); ctx.moveTo(x,y(c.h)); ctx.lineTo(x,y(c.l)); ctx.stroke();
+      const top=y(Math.max(c.o,c.c)), h=Math.max(2,Math.abs(y(c.o)-y(c.c)));
+      ctx.fillRect(x-cw*0.3, top, cw*0.6, h);
+    });
+    const last = candles[candles.length-1], ly = y(last.c);
+    ctx.setLineDash([4,4]); ctx.strokeStyle="rgba(246,231,191,.6)";
+    ctx.beginPath(); ctx.moveTo(0,ly); ctx.lineTo(W,ly); ctx.stroke(); ctx.setLineDash([]);
+    px.innerHTML = "<b>" + last.c.toFixed(2) + "</b>";
+  }
+  resize(); draw();
+  addEventListener("resize", ()=>{resize();draw();});
+  if(still) return;
+  let n=0;
+  setInterval(()=>{
+    if(document.hidden) return;
+    tick(candles[candles.length-1]); n++;
+    if(n%12===0){ candles.push(newCandle()); if(candles.length>MAX) candles.shift(); }
+    draw();
+  }, 120);
+})();
 </script>
 </body>
 </html>
