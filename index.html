@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sheikh FX | التسجيل بالدورة</title>
+<title>Sheikh FX | التسجيل بالدورات</title>
 <style>
   :root{
     --parch:#e9dcc0; --parch2:#f4ecd8; --ink:#2b1d14; --muted:#6b5a48;
@@ -61,6 +61,11 @@
   .chart .live{position:absolute;top:8px;right:10px;font-size:11px;color:#f6e7bf;display:flex;align-items:center;gap:5px}
   .chart .live i{width:7px;height:7px;border-radius:50%;background:#d9534f;animation:blink 1.2s infinite}
   @keyframes blink{50%{opacity:.25}}
+  ul.points li small{display:block;color:var(--muted);font-size:12.5px;margin-top:3px;line-height:1.7}
+  .opts{display:grid;gap:8px}
+  label.opt{display:flex;gap:10px;align-items:center;background:#fbf6e8;border:1px solid var(--line);
+    border-radius:6px;padding:11px 12px;margin:0;font-weight:500;cursor:pointer}
+  label.opt input{width:20px;height:20px;flex:none;accent-color:var(--wine);margin:0}
 </style>
 </head>
 <body>
@@ -69,7 +74,7 @@
   <header>
     <div class="brand">SHEIKH FX</div>
     <div class="crown">♛</div>
-    <h1 id="title">سجّل بدورة <span>التداول</span></h1>
+    <h1 id="title">سجّل بدورات <span>التداول</span></h1>
     <p id="sub"></p>
     <div class="chart">
       <canvas id="cv"></canvas>
@@ -92,6 +97,9 @@
 
     <label for="country">البلد / المدينة</label>
     <input id="country" placeholder="مثال: الدرباسية، سوريا">
+
+    <label>الدورات اللي بتهمك (اختر وحدة أو أكتر)</label>
+    <div class="opts" id="opts"></div>
 
     <label for="level">مستواك بالتداول</label>
     <select id="level">
@@ -127,22 +135,25 @@
 /* ============ إعدادات الصفحة: عدّل هون ============ */
 const CONFIG = {
   TELEGRAM_USERNAME: "Muhamad_fx0",
-  COURSE_NAME: "دورة التداول للمبتدئين",
+  BRAND: "Sheikh Trader",
   TITLE_WORD: "التداول",
-  SUBTITLE: "تعلّم أساسيات التداول خطوة بخطوة، من الصفر وبشكل مبسّط.",
-  POINTS: [
-    "شرح الأساسيات بلغة بسيطة",
-    "أمثلة عملية على الشارت",
-    "إدارة المخاطر ورأس المال"
+  SUBTITLE: "ثلاث دورات من الأساسيات حتى المفاهيم المتقدمة. اختر اللي بتناسبك وسجّل.",
+  COURSES: [
+    {name: "أساسيات التداول", desc: "البداية من الصفر: المصطلحات، أنواع الأوامر، وإدارة رأس المال."},
+    {name: "التحليل الفني", desc: "قراءة الشارت: الشموع، الدعم والمقاومة، الاتجاهات والمؤشرات."},
+    {name: "SMC (Smart Money Concepts)", desc: "مفاهيم السيولة، بنية السوق، والأوردر بلوك."}
   ]
 };
 /* ================================================== */
 
-const esc = s => String(s).replace(/</g,"&lt;");
+const esc = s => String(s).replace(/</g,"&lt;").replace(/"/g,"&quot;");
 const $ = id => document.getElementById(id);
-$("points").innerHTML = CONFIG.POINTS.map(p => "<li>" + esc(p) + "</li>").join("");
+$("points").innerHTML = CONFIG.COURSES.map(c =>
+  "<li><b>" + esc(c.name) + "</b><small>" + esc(c.desc) + "</small></li>").join("");
+$("opts").innerHTML = CONFIG.COURSES.map(c =>
+  '<label class="opt"><input type="checkbox" name="course" value="' + esc(c.name) + '"> ' + esc(c.name) + "</label>").join("");
 $("sub").textContent = CONFIG.SUBTITLE;
-$("title").innerHTML = "سجّل بدورة <span>" + esc(CONFIG.TITLE_WORD) + "</span>";
+$("title").innerHTML = "سجّل بدورات <span>" + esc(CONFIG.TITLE_WORD) + "</span>";
 
 let msg = "";
 
@@ -158,12 +169,15 @@ $("form").addEventListener("submit", e => {
   if (name.length < 2) return fail("اكتب اسمك");
   if (phone.replace(/\D/g,"").length < 8) return fail("اكتب رقم واتساب صحيح");
   if (!country) return fail("اكتب بلدك أو مدينتك");
+  const courses = [...document.querySelectorAll('input[name="course"]:checked')].map(x => x.value);
+  if (!courses.length) return fail("اختر دورة وحدة على الأقل");
   if (!level) return fail("اختر مستواك");
   if (!$("agree").checked) return fail("لازم توافق على تنبيه المخاطر");
   $("err").textContent = "";
 
   msg = [
-    "طلب تسجيل: " + CONFIG.COURSE_NAME,
+    "طلب تسجيل - " + CONFIG.BRAND,
+    "الدورات: " + courses.join("، "),
     "الاسم: " + name,
     "واتساب: " + phone,
     "تيليجرام: " + (tg || "-"),
