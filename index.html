@@ -61,6 +61,13 @@
   .chart .live{position:absolute;top:8px;right:10px;font-size:11px;color:#f6e7bf;display:flex;align-items:center;gap:5px}
   .chart .live i{width:7px;height:7px;border-radius:50%;background:#d9534f;animation:blink 1.2s infinite}
   @keyframes blink{50%{opacity:.25}}
+  .meta{display:inline-block;margin-right:8px;font-size:12px;color:var(--wine2);background:#efe2c2;
+    border:1px solid var(--line);border-radius:99px;padding:1px 9px;font-weight:600}
+  .meta.free{color:var(--green)}
+  .pay{background:var(--parch2);border:1px dashed var(--gold);border-radius:8px;padding:12px 14px;margin-top:14px;
+    font-size:14px;text-align:right}
+  .pay b{display:block;margin-bottom:4px;color:var(--wine2)}
+  .pay small{display:block;color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.7}
   ul.points li small{display:block;color:var(--muted);font-size:12.5px;margin-top:3px;line-height:1.7}
   .opts{display:grid;gap:8px}
   label.opt{display:flex;gap:10px;align-items:center;background:#fbf6e8;border:1px solid var(--line);
@@ -83,6 +90,7 @@
       <div class="tag">رسم توضيحي متحرك للتعليم، ليس صفقات حقيقية</div>
     </div>
     <ul class="points" id="points"></ul>
+    <div class="pay" id="pay"></div>
   </header>
 
   <form id="form" novalidate>
@@ -137,21 +145,33 @@ const CONFIG = {
   TELEGRAM_USERNAME: "Muhamad_fx0",
   BRAND: "Sheikh Trader",
   TITLE_WORD: "التداول",
-  SUBTITLE: "ثلاث دورات من الأساسيات حتى المفاهيم المتقدمة. اختر اللي بتناسبك وسجّل.",
+  SUBTITLE: "ثلاث دورات مسجّلة من الأساسيات حتى المفاهيم المتقدمة. اختر اللي بتناسبك وسجّل.",
   COURSES: [
-    {name: "أساسيات التداول", desc: "البداية من الصفر: المصطلحات، أنواع الأوامر، وإدارة رأس المال."},
-    {name: "التحليل الفني", desc: "قراءة الشارت: الشموع، الدعم والمقاومة، الاتجاهات والمؤشرات."},
-    {name: "SMC (Smart Money Concepts)", desc: "مفاهيم السيولة، بنية السوق، والأوردر بلوك."}
-  ]
+    {name: "أساسيات التداول", price: 0, duration: "",
+     desc: "البداية من الصفر: المصطلحات، أنواع الأوامر، وإدارة رأس المال."},
+    {name: "التحليل الفني", price: 70, duration: "شهرين",
+     desc: "قراءة الشارت: الشموع، الدعم والمقاومة، الاتجاهات والمؤشرات."},
+    {name: "SMC (Smart Money Concepts)", price: 80, duration: "شهر إلى شهر ونصف",
+     desc: "مفاهيم السيولة، بنية السوق، والأوردر بلوك."}
+  ],
+  PAYMENT: ["سيريتل كاش", "MTN كاش", "شام كاش", "حوالة بنكية"]
 };
+const priceText = c => c.price ? "$" + c.price : "مجانية";
 /* ================================================== */
 
 const esc = s => String(s).replace(/</g,"&lt;").replace(/"/g,"&quot;");
 const $ = id => document.getElementById(id);
 $("points").innerHTML = CONFIG.COURSES.map(c =>
-  "<li><b>" + esc(c.name) + "</b><small>" + esc(c.desc) + "</small></li>").join("");
-$("opts").innerHTML = CONFIG.COURSES.map(c =>
-  '<label class="opt"><input type="checkbox" name="course" value="' + esc(c.name) + '"> ' + esc(c.name) + "</label>").join("");
+  "<li><b>" + esc(c.name) + "</b>" +
+  '<span class="meta' + (c.price ? "" : " free") + '">' + priceText(c) + "</span>" +
+  (c.duration ? '<span class="meta">' + esc(c.duration) + "</span>" : "") +
+  "<small>" + esc(c.desc) + "</small></li>").join("");
+$("opts").innerHTML = CONFIG.COURSES.map((c,i) =>
+  '<label class="opt"><input type="checkbox" name="course" value="' + i + '"> ' +
+  esc(c.name) + " — " + priceText(c) + "</label>").join("");
+$("pay").innerHTML = "<b>طرق الدفع</b>" + esc(CONFIG.PAYMENT.join(" · ")) +
+  "<small>الدورات مسجّلة (فيديوهات). بعد التسجيل بنرسلك تفاصيل الدفع على تيليجرام. " +
+  "لا تدفع لأي حساب غير اللي بنرسلو لك من حسابنا الرسمي.</small>";
 $("sub").textContent = CONFIG.SUBTITLE;
 $("title").innerHTML = "سجّل بدورات <span>" + esc(CONFIG.TITLE_WORD) + "</span>";
 
@@ -169,7 +189,9 @@ $("form").addEventListener("submit", e => {
   if (name.length < 2) return fail("اكتب اسمك");
   if (phone.replace(/\D/g,"").length < 8) return fail("اكتب رقم واتساب صحيح");
   if (!country) return fail("اكتب بلدك أو مدينتك");
-  const courses = [...document.querySelectorAll('input[name="course"]:checked')].map(x => x.value);
+  const picked = [...document.querySelectorAll('input[name="course"]:checked')].map(x => CONFIG.COURSES[+x.value]);
+  const courses = picked.map(c => c.name + " (" + priceText(c) + ")");
+  const total = picked.reduce((s,c) => s + c.price, 0);
   if (!courses.length) return fail("اختر دورة وحدة على الأقل");
   if (!level) return fail("اختر مستواك");
   if (!$("agree").checked) return fail("لازم توافق على تنبيه المخاطر");
@@ -178,6 +200,7 @@ $("form").addEventListener("submit", e => {
   msg = [
     "طلب تسجيل - " + CONFIG.BRAND,
     "الدورات: " + courses.join("، "),
+    "المجموع: " + (total ? "$" + total : "مجاني"),
     "الاسم: " + name,
     "واتساب: " + phone,
     "تيليجرام: " + (tg || "-"),
