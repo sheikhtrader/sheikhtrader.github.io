@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sheikh FX | التسجيل بالدورة</title>
+<style>
+  :root{
+    --parch:#e9dcc0; --parch2:#f4ecd8; --ink:#2b1d14; --muted:#6b5a48;
+    --wine:#6e1423; --wine2:#4f0d19; --gold:#b8893a; --gold2:#8f6a26;
+    --line:#cdb88f; --red:#a3141f; --green:#2f6b3a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;justify-content:center;padding:22px 14px 40px;
+    color:var(--ink);font-family:system-ui,"Segoe UI",Tahoma,Arial,sans-serif;
+    background:
+      radial-gradient(900px 400px at 50% -5%,rgba(255,255,255,.45),transparent 70%),
+      radial-gradient(600px 300px at 100% 100%,rgba(110,20,35,.10),transparent 70%),
+      var(--parch);}
+  .wrap{width:100%;max-width:480px}
+  .frame{border:1px solid var(--gold2);outline:1px solid var(--line);outline-offset:4px;
+    border-radius:4px;padding:22px 18px;background:rgba(244,236,216,.55)}
+  header{text-align:center;margin-bottom:18px}
+  .brand{font-family:Georgia,"Times New Roman",serif;letter-spacing:4px;font-size:13px;color:var(--gold2);
+    border-top:1px solid var(--gold);border-bottom:1px solid var(--gold);display:inline-block;padding:4px 14px;margin-bottom:14px}
+  .crown{font-size:30px;line-height:1;margin-bottom:6px;color:var(--wine)}
+  h1{font-family:Georgia,"Traditional Arabic","Times New Roman",serif;font-size:27px;margin:0 0 8px;line-height:1.4;color:var(--wine2)}
+  h1 span{color:var(--gold2)}
+  header p{color:var(--muted);margin:0;line-height:1.8;font-size:15px}
+  ul.points{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:8px;text-align:right}
+  ul.points li{background:var(--parch2);border:1px solid var(--line);border-radius:6px;padding:10px 14px;font-size:14px}
+  ul.points li::before{content:"♛";color:var(--wine);margin-left:8px}
+  form{background:var(--parch2);border:1px solid var(--line);border-radius:8px;padding:18px;margin-top:18px;
+    box-shadow:0 6px 18px rgba(80,50,20,.12)}
+  label{display:block;font-size:14px;margin:14px 0 6px;color:var(--ink);font-weight:600}
+  label:first-of-type{margin-top:0}
+  input,select,textarea{width:100%;background:#fbf6e8;color:var(--ink);border:1px solid var(--line);
+    border-radius:6px;padding:12px;font-size:16px;font-family:inherit}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--wine);border-color:transparent}
+  textarea{min-height:76px;resize:vertical}
+  .check{display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:13px;color:var(--muted);line-height:1.7}
+  .check input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--wine)}
+  .check label{margin:0;font-weight:400;color:var(--muted)}
+  button.main{width:100%;margin-top:18px;background:linear-gradient(180deg,var(--wine),var(--wine2));color:#f6e7bf;
+    border:1px solid var(--gold);border-radius:8px;padding:14px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit}
+  button.main:active{transform:scale(.99)}
+  .err{color:var(--red);font-size:13px;margin-top:10px;min-height:18px;font-weight:600}
+  .done{display:none;text-align:center;background:var(--parch2);border:1px solid var(--line);
+    border-radius:8px;padding:22px;margin-top:18px;line-height:1.9}
+  .done h2{margin:0 0 8px;color:var(--wine2);font-family:Georgia,serif}
+  .done a.btn,.done button{display:block;width:100%;text-decoration:none;background:linear-gradient(180deg,var(--wine),var(--wine2));
+    color:#f6e7bf;border:1px solid var(--gold);border-radius:8px;padding:13px;font-weight:700;margin-top:12px;font-size:16px;cursor:pointer;font-family:inherit}
+  .done button.sec{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:600}
+  .risk{font-size:12px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="frame">
+
+  <header>
+    <div class="brand">SHEIKH FX</div>
+    <div class="crown">♛</div>
+    <h1 id="title">سجّل بدورة <span>التداول</span></h1>
+    <p id="sub"></p>
+    <ul class="points" id="points"></ul>
+  </header>
+
+  <form id="form" novalidate>
+    <label for="name">الاسم</label>
+    <input id="name" autocomplete="name" placeholder="اسمك الكامل">
+
+    <label for="phone">رقم واتساب</label>
+    <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثال: 09xxxxxxxx" dir="ltr" style="text-align:right">
+
+    <label for="tg">يوزر تيليجرام (اختياري)</label>
+    <input id="tg" placeholder="@username" dir="ltr" style="text-align:right">
+
+    <label for="country">البلد / المدينة</label>
+    <input id="country" placeholder="مثال: الدرباسية، سوريا">
+
+    <label for="level">مستواك بالتداول</label>
+    <select id="level">
+      <option value="">اختر...</option>
+      <option>مبتدئ، ما بعرف شي</option>
+      <option>تعلّمت شوي وبحاول</option>
+      <option>بتداول بس بدي أطوّر</option>
+    </select>
+
+    <label for="goal">شو بدك تستفيد من الدورة؟ (اختياري)</label>
+    <textarea id="goal" placeholder="اكتب بجملة أو اثنتين"></textarea>
+
+    <div class="check">
+      <input type="checkbox" id="agree">
+      <label for="agree">أفهم إنو التداول فيه مخاطر، وإنو المحتوى تعليمي وليس نصيحة مالية ولا ضمان للربح.</label>
+    </div>
+
+    <div class="err" id="err"></div>
+    <button class="main" type="submit">سجّل الآن</button>
+  </form>
+
+  <div class="done" id="done">
+    <h2>تقريباً خلصنا</h2>
+    <div>اضغط الزر تحت لفتح تيليجرام وإرسال بياناتك. التسجيل ما بيكتمل إلا بعد ما تضغط "إرسال" بتيليجرام.</div>
+    <a class="btn" id="tgLink" href="#" target="_blank" rel="noopener">أرسل بياناتي على تيليجرام</a>
+    <button class="sec" id="copyBtn" type="button">نسخ البيانات (إذا ما فتح تيليجرام)</button>
+  </div>
+
+  <div class="risk">تنبيه: التداول ينطوي على مخاطر عالية وقد تخسر رأس مالك. ما بنقدّم توصيات مالية.</div>
+</div></div>
+
+<script>
+/* ============ إعدادات الصفحة: عدّل هون ============ */
+const CONFIG = {
+  TELEGRAM_USERNAME: "Muhamad_fx0",
+  COURSE_NAME: "دورة التداول للمبتدئين",
+  TITLE_WORD: "التداول",
+  SUBTITLE: "تعلّم أساسيات التداول خطوة بخطوة، من الصفر وبشكل مبسّط.",
+  POINTS: [
+    "شرح الأساسيات بلغة بسيطة",
+    "أمثلة عملية على الشارت",
+    "إدارة المخاطر ورأس المال"
+  ]
+};
+/* ================================================== */
+
+const esc = s => String(s).replace(/</g,"&lt;");
+const $ = id => document.getElementById(id);
+$("points").innerHTML = CONFIG.POINTS.map(p => "<li>" + esc(p) + "</li>").join("");
+$("sub").textContent = CONFIG.SUBTITLE;
+$("title").innerHTML = "سجّل بدورة <span>" + esc(CONFIG.TITLE_WORD) + "</span>";
+
+let msg = "";
+
+$("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("name").value.trim();
+  const phone = $("phone").value.trim();
+  const tg = $("tg").value.trim();
+  const country = $("country").value.trim();
+  const level = $("level").value;
+  const goal = $("goal").value.trim();
+
+  if (name.length < 2) return fail("اكتب اسمك");
+  if (phone.replace(/\D/g,"").length < 8) return fail("اكتب رقم واتساب صحيح");
+  if (!country) return fail("اكتب بلدك أو مدينتك");
+  if (!level) return fail("اختر مستواك");
+  if (!$("agree").checked) return fail("لازم توافق على تنبيه المخاطر");
+  $("err").textContent = "";
+
+  msg = [
+    "طلب تسجيل: " + CONFIG.COURSE_NAME,
+    "الاسم: " + name,
+    "واتساب: " + phone,
+    "تيليجرام: " + (tg || "-"),
+    "البلد: " + country,
+    "المستوى: " + level,
+    "الهدف: " + (goal || "-")
+  ].join("\n");
+
+  $("tgLink").href = "https://t.me/" + CONFIG.TELEGRAM_USERNAME + "?text=" + encodeURIComponent(msg);
+  $("form").style.display = "none";
+  $("done").style.display = "block";
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+
+$("copyBtn").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(msg); $("copyBtn").textContent = "تم النسخ ✓"; }
+  catch(_) { prompt("انسخ البيانات:", msg); }
+});
+
+function fail(t){ $("err").textContent = t; }
+</script>
+</body>
+</html>
